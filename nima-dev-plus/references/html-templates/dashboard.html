@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐴 需求驾驶舱 — {storyNameCN}</title>
+<style>
+/* === 基础重置 === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --accent: #3b82f6;
+  --accent-light: #dbeafe;
+  --success: #22c55e;
+  --success-light: #dcfce7;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --info: #06b6d4;
+  --info-light: #cffafe;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-light: #1e3a5f;
+    --success: #4ade80;
+    --success-light: #14532d;
+    --warning: #fbbf24;
+    --warning-light: #451a03;
+    --danger: #f87171;
+    --danger-light: #450a0a;
+    --info: #22d3ee;
+    --info-light: #083344;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+  }
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* === 顶部标题栏 === */
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+.header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+.header-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* === 徽章 === */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.25rem 0.75rem; border-radius: 9999px;
+  font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+}
+.badge-feat { background: var(--accent-light); color: var(--accent); }
+.badge-fix { background: var(--warning-light); color: var(--warning); }
+.badge-full { background: var(--info-light); color: var(--info); }
+.badge-quick { background: var(--success-light); color: var(--success); }
+.badge-simple { background: var(--success-light); color: var(--success); }
+.badge-fullstack { background: var(--accent-light); color: var(--accent); }
+.badge-backend { background: var(--text-secondary); color: white; }
+.badge-done { background: var(--success-light); color: var(--success); }
+.badge-active { background: var(--accent-light); color: var(--accent); }
+.badge-pending { background: var(--bg-secondary); color: var(--text-muted); }
+
+/* === 主布局 === */
+.main { max-width: 1200px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+/* === 卡片 === */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-header h2 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.card-body { padding: 1.5rem; }
+
+/* === 元数据网格 === */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.meta-item label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-item span, .meta-item code { font-size: 0.875rem; color: var(--text-primary); }
+.meta-item code { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.8rem; }
+
+/* === 环境标签 === */
+.env-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.env-tag {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  padding: 0.25rem 0.625rem; border-radius: var(--radius-sm);
+  font-size: 0.75rem; color: var(--text-secondary);
+}
+
+/* === 进度条 === */
+.progress-bar {
+  width: 100%; height: 8px; background: var(--bg-secondary);
+  border-radius: 9999px; overflow: hidden; margin-bottom: 0.5rem;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--info));
+  border-radius: 9999px; transition: width 0.5s ease;
+}
+.progress-text { font-size: 0.875rem; color: var(--text-secondary); text-align: center; }
+
+/* === 阶段链 === */
+.phase-chain {
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center;
+  padding: 1.5rem 0;
+}
+.phase-node {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+  min-width: 80px; text-align: center;
+}
+.phase-node.done { background: var(--success-light); }
+.phase-node.active { background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent); }
+.phase-node.pending { background: var(--bg-secondary); opacity: 0.5; }
+.node-icon { font-size: 1.25rem; }
+.node-name { font-size: 0.75rem; font-weight: 600; }
+.node-time { font-size: 0.65rem; color: var(--text-muted); }
+.phase-arrow { font-size: 1.25rem; color: var(--text-muted); margin: 0 0.25rem; }
+.phase-arrow.done { color: var(--success); }
+.phase-arrow.active { color: var(--accent); }
+
+/* === 表格 === */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td {
+  padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* === 修改记录时间线 === */
+.changelog { position: relative; padding-left: 1.5rem; }
+.changelog::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.changelog-entry {
+  position: relative; padding: 0.75rem 0;
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.changelog-entry::before {
+  content: ''; position: absolute; left: -1.65rem; top: 1.1rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-card);
+}
+.changelog-entry.milestone::before { background: var(--success); }
+.changelog-time { font-size: 0.75rem; color: var(--text-muted); min-width: 100px; }
+.changelog-author {
+  font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.5rem;
+  border-radius: 4px; background: var(--bg-secondary);
+}
+.changelog-author.ai { background: var(--info-light); color: var(--info); }
+.changelog-action { font-size: 0.875rem; flex: 1; }
+
+/* === TODO 看板 === */
+.todo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.75rem; }
+.todo-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.625rem 0.875rem; border-radius: var(--radius-sm);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.todo-item.done { background: var(--success-light); border-color: var(--success); }
+.todo-item.done .todo-text { text-decoration: line-through; opacity: 0.6; }
+.todo-item.in-progress { background: var(--accent-light); border-color: var(--accent); }
+.todo-status { font-size: 1rem; }
+.todo-text { flex: 1; }
+.todo-iteration { font-size: 0.65rem; color: var(--text-muted); background: var(--bg-card); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+/* === 风险区 === */
+.risk-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.risk-item {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+  background: var(--warning-light); border-left: 3px solid var(--warning);
+  font-size: 0.875rem;
+}
+
+/* === 总结区 === */
+.summary-locked {
+  text-align: center; padding: 2rem; color: var(--text-muted);
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+}
+.summary-card {
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  padding: 1.25rem; margin-bottom: 1rem;
+}
+.summary-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
+.stat-item { text-align: center; }
+.stat-num { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 0.75rem; color: var(--text-muted); }
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.feature-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; }
+.feature-list .check { color: var(--success); }
+.signoff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.signoff-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.signoff-item label { font-size: 0.75rem; color: var(--text-muted); }
+.signoff-value { font-size: 0.875rem; font-weight: 600; }
+.signoff-stamp { font-size: 0.75rem; color: var(--danger); font-style: italic; }
+.status-done { color: var(--success); }
+
+/* === 关键词 === */
+.keyword-group { margin-bottom: 1rem; }
+.keyword-group h4 { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.keyword-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.keyword-tag {
+  padding: 0.2rem 0.6rem; border-radius: 9999px;
+  font-size: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* === 底部 === */
+.footer {
+  text-align: center; padding: 1.5rem; color: var(--text-muted);
+  font-size: 0.75rem; border-top: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+/* === 折叠 === */
+.collapsible { cursor: pointer; }
+.collapsible::after { content: ' ▼'; font-size: 0.7rem; }
+.collapsible.collapsed::after { content: ' ▶'; }
+.collapsible-content { overflow: hidden; }
+.collapsible-content.hidden { display: none; }
+
+/* === 打印 === */
+@media print {
+  .header { box-shadow: none; }
+  .card { box-shadow: none; break-inside: avoid; }
+  body { background: white; color: black; }
+}
+
+/* === 响应式 === */
+@media (max-width: 768px) {
+  .main { padding: 1rem; }
+  .header { padding: 1rem; }
+  .phase-chain { flex-direction: column; }
+  .phase-arrow { transform: rotate(90deg); }
+  .meta-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部标题栏 -->
+<div class="header">
+  <h1>🐴 需求驾驶舱 — {storyNameCN}</h1>
+  <div class="header-badges">
+    <span class="badge badge-{storyType}">{storyType}</span>
+    <span class="badge badge-{workMode}">{workMode}</span>
+    <span class="badge badge-{devMode}">{devMode}</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ① 元数据区 -->
+  <!-- ⚠️ 所有数据必须从 context.json 读取，不要硬编码或从记忆推断 -->
+  <div class="card">
+    <div class="card-header"><h2>📌 需求元数据</h2></div>
+    <div class="card-body">
+      <div class="meta-grid">
+        <div class="meta-item"><label>需求号</label><span>{storyId}</span></div>
+        <div class="meta-item"><label>中文名</label><span>{storyNameCN}</span></div>
+        <div class="meta-item"><label>英文名</label><span>{storyNameEN}</span></div>
+        <div class="meta-item"><label>类型</label><span>{storyType}</span></div>
+        <div class="meta-item"><label>工作模式</label><span>{workMode}</span></div>
+        <div class="meta-item"><label>开发模式</label><span>{devMode}</span></div>
+        <div class="meta-item"><label>作者</label><span>{storyAuthor}</span></div>
+        <div class="meta-item"><label>分支</label><code>{storyBranch}</code></div>
+        <div class="meta-item"><label>创建时间</label><span>{createdAt}</span></div>
+        <div class="meta-item"><label>更新时间</label><span>{updatedAt}</span></div>
+        <div class="meta-item"><label>当前阶段</label><span>{currentPhase}</span></div>
+        <div class="meta-item"><label>当前迭代</label><span>第 {currentIteration} 轮</span></div>
+      </div>
+      <!-- ⚠️ 项目环境数据必须从 context.json 的 projectEnv 字段读取 -->
+      <div class="env-tags">
+        <span class="env-tag">JDK {javaVersion}</span>
+        <span class="env-tag">Spring Boot {springBootVersion}</span>
+        <span class="env-tag">{ormFramework}</span>
+        <span class="env-tag">{businessFramework}</span>
+        <span class="env-tag">{toolkit}</span>
+        <span class="env-tag">{frontendStack}</span>
+        <span class="env-tag">{databaseType}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 进度仪表盘 -->
+  <div class="card">
+    <div class="card-header"><h2>📊 阶段进度</h2></div>
+    <div class="card-body">
+      <div class="progress-bar"><div class="progress-fill" style="width: {progressPercent}%"></div></div>
+      <p class="progress-text">{doneCount} / {totalCount} 阶段已完成（{progressPercent}%）</p>
+      <div class="phase-chain">
+        <!-- 阶段节点由 Agent 动态生成 -->
+        {phaseChainNodes}
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 阶段产出清单 -->
+  <!-- ⚠️ 不要列出 KW-关键词 文件（关键词仅存 context.json，不生成 HTML） -->
+  <!-- ⚠️ 不要列出 D-驾驶舱 自身（本页就是驾驶舱） -->
+  <div class="card">
+    <div class="card-header"><h2>📄 阶段产出清单</h2></div>
+    <div class="card-body">
+      <table class="data-table">
+        <thead><tr><th>阶段</th><th>状态</th><th>产出文件</th><th>完成时间</th></tr></thead>
+        <tbody>
+          <!-- Agent 动态填充，仅列出实际存在的产出文件 -->
+          {phaseOutputs}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ④ 产出文档导航 -->
+  <div class="card">
+    <div class="card-header"><h2>🔗 产出文档导航</h2></div>
+    <div class="card-body">
+      <div class="env-tags">
+        <!-- Agent 动态填充链接 -->
+        {docLinks}
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 修改记录 -->
+  <div class="card">
+    <div class="card-header"><h2>📝 修改记录</h2></div>
+    <div class="card-body">
+      <div class="changelog">
+        <!-- Agent 动态填充 -->
+        {changelogEntries}
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ TODO 看板 -->
+  <!-- ⚠️ 仅渲染 context.json 的 todos 数组，不要重复渲染 phases 的完成状态 -->
+  <!-- ⚠️ 如果 todos 为空，显示"暂无待办"而非空白 -->
+  <div class="card">
+    <div class="card-header"><h2>✅ TODO 看板</h2></div>
+    <div class="card-body">
+      <div class="todo-grid">
+        <!-- Agent 动态填充，从 context.json 的 todos 数组读取 -->
+        {todoItems}
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 风险与问题 -->
+  <div class="card">
+    <div class="card-header"><h2>⚠️ 风险与问题</h2></div>
+    <div class="card-body">
+      <div class="risk-list">
+        <!-- Agent 动态填充 -->
+        {riskItems}
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑧ 总结文档 -->
+  <div class="card">
+    <div class="card-header"><h2>🏁 总结文档</h2></div>
+    <div class="card-body">
+      <div class="summary-locked" id="summaryLocked">
+        <p>🔒 此区域在当前迭代完成后自动解锁</p>
+      </div>
+      <div id="summaryContent">
+        <!-- Agent 动态填充总结内容 -->
+        {summaryContent}
+      </div>
+    </div>
+  </div>
+
+  <!-- 关键词索引 -->
+  <div class="card">
+    <div class="card-header"><h2>🏷️ 关键词索引</h2></div>
+    <div class="card-body">
+      <!-- Agent 动态填充 -->
+      {keywordTags}
+    </div>
+  </div>
+
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  ── 由 🐴 泥马开发 v4.0 生成 │ {generatedTime} ──
+</div>
+
+<script>
+// 折叠功能
+document.querySelectorAll('.collapsible').forEach(el => {
+  el.addEventListener('click', () => {
+    el.classList.toggle('collapsed');
+    el.nextElementSibling.classList.toggle('hidden');
+  });
+});
+</script>
+</body>
+</html>

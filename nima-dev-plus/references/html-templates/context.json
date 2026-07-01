@@ -1,0 +1,74 @@
+{
+  "storyId": "yyyyMMdd",
+  "storyNameCN": "需求中文名",
+  "storyNameEN": "StoryNameEN",
+  "storyType": "feat",
+  "storyDesc": "yyyyMMdd-StoryNameEN",
+  "storyAuthor": "developer",
+  "storyBranch": "developer/feat-yyyyMMdd-StoryNameEN",
+  "workMode": "完整",
+  "devMode": "全栈",
+  "currentPhase": "筑基",
+  "currentIteration": 0,
+  "iterations": [
+    {
+      "index": 0,
+      "type": "initial",
+      "description": "初始需求描述",
+      "phases": {
+        "筑基": { "done": false, "completedAt": null },
+        "需求澄清": { "done": false, "output": "", "completedAt": null },
+        "现状分析": { "done": false, "output": "", "completedAt": null },
+        "研发设计": { "done": false, "output": "", "completedAt": null },
+        "原型确认": { "done": false, "output": "", "skipped": false, "skipReason": "", "completedAt": null },
+        "开发交付": { "done": false, "completedAt": null },
+        "闭环反馈": { "done": false, "completedAt": null },
+        "功能自验证": { "done": false, "skipped": false, "skipReason": "", "completedAt": null },
+        "归档交付": { "done": false, "completedAt": null }
+      },
+      "summary": null
+    }
+  ],
+  "projectEnv": {
+    "javaVersion": "",
+    "springBootVersion": "",
+    "ormFramework": "",
+    "businessFramework": "",
+    "toolkit": "",
+    "frontendStack": "",
+    "databaseType": "",
+    "backendProject": "",
+    "frontendProject": "",
+    "detected": false
+  },
+  "todos": [],
+  "keywords": {
+    "domain": [],
+    "pattern": [],
+    "scenario": [],
+    "concept": []
+  },
+  "relatedStories": [],
+  "verification": {
+    "enabled": false,
+    "rounds": [],
+    "currentRound": 0,
+    "status": "pending",
+    "bugsFound": [],
+    "bugsFixed": [],
+    "lastVerifiedAt": null
+  },
+  "projectRuntime": {
+    "backendCommand": "",
+    "frontendCommand": "",
+    "backendPort": null,
+    "frontendPort": null,
+    "backendPid": null,
+    "frontendPid": null
+  },
+  "branch": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "archived": false,
+  "archivedAt": null
+}

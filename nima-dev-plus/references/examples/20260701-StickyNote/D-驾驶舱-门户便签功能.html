@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐴 需求驾驶舱 — 门户便签功能</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --accent: #3b82f6;
+  --accent-light: #dbeafe;
+  --success: #22c55e;
+  --success-light: #dcfce7;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --info: #06b6d4;
+  --info-light: #cffafe;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #334155;
+    --accent: #60a5fa;
+    --accent-light: #1e3a5f;
+    --success: #4ade80;
+    --success-light: #14532d;
+    --warning: #fbbf24;
+    --warning-light: #451a03;
+    --danger: #f87171;
+    --danger-light: #450a0a;
+    --info: #22d3ee;
+    --info-light: #083344;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+  }
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+.header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+.header-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.25rem 0.75rem; border-radius: 9999px;
+  font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+}
+.badge-feat { background: var(--accent-light); color: var(--accent); }
+.badge-full { background: var(--info-light); color: var(--info); }
+.badge-fullstack { background: var(--accent-light); color: var(--accent); }
+.badge-done { background: var(--success-light); color: var(--success); }
+.badge-active { background: var(--accent-light); color: var(--accent); }
+.badge-pending { background: var(--bg-secondary); color: var(--text-muted); }
+.main { max-width: 1200px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-header h2 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.card-body { padding: 1.5rem; }
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.meta-item label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-item span, .meta-item code { font-size: 0.875rem; color: var(--text-primary); }
+.meta-item code { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.8rem; }
+.env-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.env-tag {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  padding: 0.25rem 0.625rem; border-radius: var(--radius-sm);
+  font-size: 0.75rem; color: var(--text-secondary);
+}
+.progress-bar {
+  width: 100%; height: 8px; background: var(--bg-secondary);
+  border-radius: 9999px; overflow: hidden; margin-bottom: 0.5rem;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--info));
+  border-radius: 9999px; transition: width 0.5s ease;
+}
+.progress-text { font-size: 0.875rem; color: var(--text-secondary); text-align: center; }
+.phase-chain {
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center;
+  padding: 1.5rem 0;
+}
+.phase-node {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+  min-width: 80px; text-align: center;
+}
+.phase-node.done { background: var(--success-light); }
+.phase-node.active { background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent); }
+.phase-node.pending { background: var(--bg-secondary); opacity: 0.5; }
+.node-icon { font-size: 1.25rem; }
+.node-name { font-size: 0.75rem; font-weight: 600; }
+.node-time { font-size: 0.65rem; color: var(--text-muted); }
+.phase-arrow { font-size: 1.25rem; color: var(--text-muted); margin: 0 0.25rem; }
+.phase-arrow.done { color: var(--success); }
+.phase-arrow.active { color: var(--accent); }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td {
+  padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); }
+.data-table tr:last-child td { border-bottom: none; }
+.changelog { position: relative; padding-left: 1.5rem; }
+.changelog::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.changelog-entry {
+  position: relative; padding: 0.75rem 0;
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.changelog-entry::before {
+  content: ''; position: absolute; left: -1.65rem; top: 1.1rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-card);
+}
+.changelog-entry.milestone::before { background: var(--success); }
+.changelog-time { font-size: 0.75rem; color: var(--text-muted); min-width: 100px; }
+.changelog-author {
+  font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.5rem;
+  border-radius: 4px; background: var(--bg-secondary);
+}
+.changelog-author.ai { background: var(--info-light); color: var(--info); }
+.changelog-action { font-size: 0.875rem; flex: 1; }
+.todo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.75rem; }
+.todo-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.625rem 0.875rem; border-radius: var(--radius-sm);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.todo-item.done { background: var(--success-light); border-color: var(--success); }
+.todo-item.done .todo-text { text-decoration: line-through; opacity: 0.6; }
+.todo-item.in-progress { background: var(--accent-light); border-color: var(--accent); }
+.todo-status { font-size: 1rem; }
+.todo-text { flex: 1; }
+.summary-locked {
+  text-align: center; padding: 2rem; color: var(--text-muted);
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+}
+.keyword-group { margin-bottom: 1rem; }
+.keyword-group h4 { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.keyword-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.keyword-tag {
+  padding: 0.2rem 0.6rem; border-radius: 9999px;
+  font-size: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.footer {
+  text-align: center; padding: 1.5rem; color: var(--text-muted);
+  font-size: 0.75rem; border-top: 1px solid var(--border);
+  background: var(--bg-card);
+}
+@media print {
+  .header { box-shadow: none; }
+  .card { box-shadow: none; break-inside: avoid; }
+  body { background: white; color: black; }
+}
+@media (max-width: 768px) {
+  .main { padding: 1rem; }
+  .header { padding: 1rem; }
+  .phase-chain { flex-direction: column; }
+  .phase-arrow { transform: rotate(90deg); }
+  .meta-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐴 需求驾驶舱 — 门户便签功能</h1>
+  <div class="header-badges">
+    <span class="badge badge-feat">feat</span>
+    <span class="badge badge-full">完整模式</span>
+    <span class="badge badge-fullstack">全栈</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ① 元数据区 -->
+  <div class="card">
+    <div class="card-header"><h2>📌 需求元数据</h2></div>
+    <div class="card-body">
+      <div class="meta-grid">
+        <div class="meta-item"><label>需求号</label><span>20260701</span></div>
+        <div class="meta-item"><label>中文名</label><span>门户便签功能</span></div>
+        <div class="meta-item"><label>英文名</label><span>StickyNote</span></div>
+        <div class="meta-item"><label>类型</label><span>feat</span></div>
+        <div class="meta-item"><label>工作模式</label><span>完整</span></div>
+        <div class="meta-item"><label>开发模式</label><span>全栈</span></div>
+        <div class="meta-item"><label>作者</label><span>stone</span></div>
+        <div class="meta-item"><label>分支</label><code>stone/feat-20260701-StickyNote</code></div>
+        <div class="meta-item"><label>创建时间</label><span>2026-07-01 10:00</span></div>
+        <div class="meta-item"><label>更新时间</label><span>2026-07-01 10:00</span></div>
+        <div class="meta-item"><label>当前阶段</label><span>📦 已归档</span></div>
+        <div class="meta-item"><label>当前迭代</label><span>第 0 轮</span></div>
+      </div>
+      <div class="env-tags">
+        <span class="env-tag">JDK 17</span>
+        <span class="env-tag">ContiNew Starter 2.14.0</span>
+        <span class="env-tag">MyBatis-Plus</span>
+        <span class="env-tag">continew-crud</span>
+        <span class="env-tag">Lombok, Hutool</span>
+        <span class="env-tag">Vue 3.5 + Vite 6 + TS</span>
+        <span class="env-tag">Element Plus + Tailwind CSS 4</span>
+        <span class="env-tag">MySQL</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 进度仪表盘 -->
+  <div class="card">
+    <div class="card-header"><h2>📊 阶段进度</h2></div>
+    <div class="card-body">
+      <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+      <p class="progress-text">7 / 7 阶段已完成（100%）— 📦 已归档</p>
+      <div class="phase-chain">
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">筑基</span><span class="node-time">10:00</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">需求澄清</span><span class="node-time">10:05</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">现状分析</span><span class="node-time">10:10</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">研发设计</span><span class="node-time">10:15</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">⏭</span><span class="node-name">原型确认(跳过)</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">开发交付</span><span class="node-time">10:30</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">闭环反馈</span><span class="node-time">10:35</span></div>
+        <span class="phase-arrow done">→</span>
+        <div class="phase-node done"><span class="node-icon">✅</span><span class="node-name">归档交付</span><span class="node-time">10:35</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 阶段产出清单 -->
+  <div class="card">
+    <div class="card-header"><h2>📄 阶段产出清单</h2></div>
+    <div class="card-body">
+      <table class="data-table">
+        <thead><tr><th>阶段</th><th>状态</th><th>产出文件</th><th>完成时间</th></tr></thead>
+        <tbody>
+          <tr><td>筑基</td><td>✅ 完成</td><td>context.json, D-驾驶舱</td><td>2026-07-01 10:00</td></tr>
+          <tr><td>需求澄清</td><td>✅ 完成</td><td><a href="1-需求澄清-门户便签功能.html">1-需求澄清-门户便签功能.html</a></td><td>2026-07-01 10:05</td></tr>
+          <tr><td>现状分析</td><td>✅ 完成</td><td><a href="2-现状分析-门户便签功能.html">2-现状分析-门户便签功能.html</a></td><td>2026-07-01 10:10</td></tr>
+          <tr><td>研发设计</td><td>✅ 完成</td><td><a href="3-研发设计-门户便签功能.html">3-研发设计-门户便签功能.html</a></td><td>2026-07-01 10:15</td></tr>
+          <tr><td>原型确认</td><td>⏭ 跳过</td><td>—</td><td>—</td></tr>
+          <tr><td>开发交付</td><td>✅ 完成</td><td>代码实现</td><td>2026-07-01 10:30</td></tr>
+          <tr><td>闭环反馈</td><td>✅ 完成</td><td>验证报告</td><td>2026-07-01 10:35</td></tr>
+          <tr><td>归档交付</td><td>✅ 完成</td><td><a href="SUM-总结-门户便签功能-1.html">SUM-总结</a> / <a href="KW-关键词-门户便签功能.html">KW-关键词</a> / <a href="sql/sticky_note.sql">建表SQL</a></td><td>2026-07-01 10:35</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ④ 产出文档导航 -->
+  <div class="card">
+    <div class="card-header"><h2>🔗 产出文档导航</h2></div>
+    <div class="card-body">
+      <div class="env-tags">
+        <span class="env-tag">📌 context.json (机器侧状态)</span>
+        <span class="env-tag">🚀 D-驾驶舱 (本页)</span>
+        <span class="env-tag">🎯 <a href="1-需求澄清-门户便签功能.html" style="color:inherit;text-decoration:none">1-需求澄清</a></span>
+        <span class="env-tag">🔍 <a href="2-现状分析-门户便签功能.html" style="color:inherit;text-decoration:none">2-现状分析</a></span>
+        <span class="env-tag">📐 <a href="3-研发设计-门户便签功能.html" style="color:inherit;text-decoration:none">3-研发设计</a></span>
+        <span class="env-tag">📊 <a href="SUM-总结-门户便签功能-1.html" style="color:inherit;text-decoration:none">总结v1</a></span>
+        <span class="env-tag">🗄 <a href="sql/sticky_note.sql" style="color:inherit;text-decoration:none">建表SQL</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 修改记录 -->
+  <div class="card">
+    <div class="card-header"><h2>📝 修改记录</h2></div>
+    <div class="card-body">
+      <div class="changelog">
+        <div class="changelog-entry milestone">
+          <span class="changelog-time">2026-07-01 10:35</span>
+          <span class="changelog-author ai">AI</span>
+          <span class="changelog-action">归档交付完成：总结v1 + 建表SQL，需求空间锁定</span>
+        </div>
+        <div class="changelog-entry milestone">
+          <span class="changelog-time">2026-07-01 10:15</span>
+          <span class="changelog-author ai">AI</span>
+          <span class="changelog-action">完成研发设计文档（含角色互搏），确定技术方案：纯文本+防抖保存+update_time排序，跳过原型确认</span>
+        </div>
+        <div class="changelog-entry milestone">
+          <span class="changelog-time">2026-07-01 10:10</span>
+          <span class="changelog-author ai">AI</span>
+          <span class="changelog-action">完成现状分析文档，梳理打印工具流程、后端 CRUD 模式、确定新增文件清单和数据库表结构</span>
+        </div>
+        <div class="changelog-entry milestone">
+          <span class="changelog-time">2026-07-01 10:05</span>
+          <span class="changelog-author ai">AI</span>
+          <span class="changelog-action">完成需求澄清文档，明确功能范围：创建/编辑/删除便签 + 实时保存 + 后端持久化</span>
+        </div>
+        <div class="changelog-entry milestone">
+          <span class="changelog-time">2026-07-01 10:00</span>
+          <span class="changelog-author ai">AI</span>
+          <span class="changelog-action">创建需求空间，完成筑基阶段，初始化双轨制数据文件</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ TODO 看板 -->
+  <div class="card">
+    <div class="card-header"><h2>✅ TODO 看板</h2></div>
+    <div class="card-body">
+      <div class="todo-grid">
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">需求澄清文档编写</span></div>
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">现状分析</span></div>
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">研发设计（含角色互搏）</span></div>
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">开发交付</span></div>
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">闭环反馈</span></div>
+        <div class="todo-item done"><span class="todo-status">✅</span><span class="todo-text">归档交付</span></div>
+        <div class="todo-item"><span class="todo-status">⬜</span><span class="todo-text">研发设计（含角色互搏）</span></div>
+        <div class="todo-item"><span class="todo-status">⬜</span><span class="todo-text">开发交付</span></div>
+        <div class="todo-item"><span class="todo-status">⬜</span><span class="todo-text">闭环反馈</span></div>
+        <div class="todo-item"><span class="todo-status">⬜</span><span class="todo-text">归档交付</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 风险与问题 -->
+  <div class="card">
+    <div class="card-header"><h2>⚠️ 风险与问题</h2></div>
+    <div class="card-body">
+      <p style="color:var(--text-muted); font-size:0.875rem;">暂无识别风险，将在后续阶段持续更新</p>
+    </div>
+  </div>
+
+  <!-- ⑧ 总结文档 -->
+  <div class="card">
+    <div class="card-header"><h2>🏁 总结文档</h2></div>
+    <div class="card-body">
+      <div class="summary-locked">
+        <p>🔒 此区域在当前迭代完成后自动解锁</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  ── 由 🐴 泥马开发 v4.0 生成 │ 📦 归档时间：2026-07-01 10:35 ──
+</div>
+
+</body>
+</html>

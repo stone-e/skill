@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【代码片段】{storyNameCN} — 泥马开发</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-card: #ffffff;
+  --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+  --border: #e2e8f0; --accent: #3b82f6; --accent-light: #dbeafe;
+  --success: #22c55e; --success-light: #dcfce7;
+  --warning: #f59e0b; --warning-light: #fef3c7;
+  --danger: #ef4444; --danger-light: #fee2e2;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1); --radius: 12px; --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+    --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+    --border: #334155; --accent: #60a5fa; --accent-light: #1e3a5f;
+    --success: #4ade80; --success-light: #14532d;
+    --warning: #fbbf24; --warning-light: #451a03;
+    --danger: #f87171; --danger-light: #450a0a;
+  }
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.header { text-align: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.header .subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.card-body { padding: 1.5rem; }
+pre { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 0; }
+code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+.diff-add { background: var(--success-light); display: block; }
+.diff-del { background: var(--danger-light); text-decoration: line-through; display: block; }
+.diff-context { color: var(--text-muted); display: block; }
+.file-path { background: var(--accent-light); color: var(--accent); padding: 0.5rem 1rem; border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-size: 0.8rem; font-weight: 600; margin-bottom: -1px; position: relative; z-index: 1; }
+.api-block { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 1rem; overflow: hidden; }
+.api-header { background: var(--bg-secondary); padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.api-method { padding: 0.125rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+.api-get { background: var(--success-light); color: var(--success); }
+.api-post { background: var(--accent-light); color: var(--accent); }
+.api-url { font-family: monospace; font-size: 0.875rem; }
+.api-body { padding: 1rem; }
+.footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.75rem; }
+@media print { .card { box-shadow: none; break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🐴 【代码片段 / 接口契约】{storyNameCN}</h1>
+    <p class="subtitle">需求号：{storyId} │ 作者：{storyAuthor} │ {createdAt}</p>
+  </div>
+
+  <!-- 场景说明 -->
+  <div class="card">
+    <div class="card-header">📋 变更说明</div>
+    <div class="card-body">
+      <p>{changeDescription}</p>
+    </div>
+  </div>
+
+  <!-- 代码片段（可多个） -->
+  {codeBlocks}
+
+  <!-- 接口契约（可多个） -->
+  {apiBlocks}
+
+  <!-- 确认提示 -->
+  <div class="card" style="border-color: var(--warning);">
+    <div class="card-header" style="background: var(--warning-light);">⚠️ 请确认</div>
+    <div class="card-body">
+      <p>以上为本次改动的核心代码片段和接口设计，请确认：</p>
+      <ul style="margin-top: 0.75rem; padding-left: 1.5rem;">
+        <li>代码逻辑是否符合预期？</li>
+        <li>接口设计是否满足需求？</li>
+        <li>是否有遗漏或需要调整的地方？</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+        确认无误后，告诉 Agent「设计正确，开始开发」；需要修改则直接说明修改意见。
+      </p>
+    </div>
+  </div>
+
+</div>
+<div class="footer">── 由 🐴 泥马开发 v4.0 生成 │ {generatedTime} ──</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{
+  "storyId": "20260701",
+  "storyNameCN": "门户便签功能",
+  "storyNameEN": "StickyNote",
+  "storyType": "feat",
+  "storyDesc": "20260701-StickyNote",
+  "storyAuthor": "stone",
+  "storyBranch": "stone/feat-20260701-StickyNote",
+  "workMode": "完整",
+  "devMode": "全栈",
+  "currentPhase": "归档交付",
+  "currentIteration": 0,
+  "iterations": [
+    {
+      "index": 0,
+      "type": "initial",
+      "description": "门户起始页常用工具新增便签功能，参考 Windows 便签，支持创建/编辑/删除，实时保存，后端持久化",
+      "phases": {
+        "筑基": { "done": true, "completedAt": "2026-07-01T10:00:00+08:00" },
+        "需求澄清": { "done": true, "output": "1-需求澄清-门户便签功能.html", "completedAt": "2026-07-01T10:05:00+08:00" },
+        "现状分析": { "done": true, "output": "2-现状分析-门户便签功能.html", "completedAt": "2026-07-01T10:10:00+08:00" },
+        "研发设计": { "done": true, "output": "3-研发设计-门户便签功能.html", "completedAt": "2026-07-01T10:15:00+08:00" },
+        "原型确认": { "done": false, "output": "", "skipped": true, "skipReason": "交互简单（列表+卡片+textarea），无复杂交互或多种设计方案歧义", "completedAt": null },
+        "开发交付": { "done": true, "completedAt": "2026-07-01T10:30:00+08:00" },
+        "闭环反馈": { "done": true, "completedAt": "2026-07-01T10:35:00+08:00" },
+        "功能自验证": { "done": false, "skipped": true, "skipReason": "示例中跳过", "completedAt": null },
+        "归档交付": { "done": true, "completedAt": "2026-07-01T10:35:00+08:00" }
+      },
+      "summary": "SUM-总结-门户便签功能-1.html"
+    }
+  ],
+  "projectEnv": {
+    "javaVersion": "1.8",
+    "springBootVersion": "Spring Boot (Jeecg-boot 3.x)",
+    "ormFramework": "MyBatis-Plus",
+    "businessFramework": "Jeecg-boot",
+    "toolkit": "Lombok, Hutool",
+    "frontendStack": "Vue 3.5 + Vite 6 + TypeScript + Element Plus + Tailwind CSS 4 + Pinia",
+    "databaseType": "MySQL",
+    "backendProject": "{项目路径}/ms-boot-office/ms-boot-module-portal",
+    "frontendProject": "{项目路径}/ms-portal-web",
+    "detected": true
+  },
+  "todos": [],
+  "keywords": {
+    "domain": ["起始页", "工作台"],
+    "pattern": ["工具嵌入", "弹窗交互", "实时保存"],
+    "scenario": ["个人效率", "快速备忘"],
+    "concept": ["便签", "备忘"]
+  },
+  "relatedStories": [],
+  "verification": {
+    "enabled": false,
+    "rounds": [],
+    "currentRound": 0,
+    "status": "skipped",
+    "bugsFound": [],
+    "bugsFixed": [],
+    "lastVerifiedAt": null
+  },
+  "projectRuntime": {
+    "backendCommand": "mvn spring-boot:run",
+    "frontendCommand": "pnpm dev",
+    "backendPort": 8080,
+    "frontendPort": 5173,
+    "backendPid": null,
+    "frontendPid": null
+  },
+  "branch": "stone/feat-20260701-StickyNote",
+  "createdAt": "2026-07-01T10:00:00+08:00",
+  "updatedAt": "2026-07-01T10:40:00+08:00",
+  "archived": true,
+  "archivedAt": "2026-07-01T10:40:00+08:00"
+}

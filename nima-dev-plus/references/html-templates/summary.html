@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【总结】{storyNameCN} — 泥马开发</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-card: #ffffff;
+  --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+  --border: #e2e8f0; --accent: #3b82f6; --accent-light: #dbeafe;
+  --success: #22c55e; --success-light: #dcfce7;
+  --warning: #f59e0b; --warning-light: #fef3c7;
+  --danger: #ef4444; --danger-light: #fee2e2;
+  --info: #06b6d4; --info-light: #cffafe;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1); --radius: 12px; --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+    --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+    --border: #334155; --accent: #60a5fa; --accent-light: #1e3a5f;
+    --success: #4ade80; --success-light: #14532d;
+    --warning: #fbbf24; --warning-light: #451a03;
+    --danger: #f87171; --danger-light: #450a0a;
+    --info: #22d3ee; --info-light: #083344;
+  }
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.header { text-align: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.header .subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.card-body { padding: 1.5rem; }
+.section { margin-bottom: 1.5rem; }
+.section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); }
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+th, td { padding: 0.625rem 0.875rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+th { background: var(--bg-secondary); font-weight: 600; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+.stat-item { text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-sm); }
+.stat-num { font-size: 1.75rem; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+.feature-list { list-style: none; }
+.feature-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.feature-list li:last-child { border-bottom: none; }
+.feature-list .icon { font-size: 1rem; }
+.feature-list .version { font-size: 0.7rem; background: var(--accent-light); color: var(--accent); padding: 0.1rem 0.4rem; border-radius: 4px; }
+.iteration-table { margin-bottom: 1.5rem; }
+.signoff-box { border: 2px solid var(--success); border-radius: var(--radius); padding: 1.5rem; background: var(--success-light); text-align: center; }
+.signoff-box .stamp { font-size: 1.25rem; font-weight: 700; color: var(--success); margin-top: 0.5rem; }
+.footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.75rem; }
+@media print { .card { box-shadow: none; break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🐴 【总结 v{version}】{storyNameCN}</h1>
+    <p class="subtitle">需求号：{storyId} │ 作者：{storyAuthor} │ {createdAt}</p>
+  </div>
+
+  <!-- 需求完成总结 -->
+  <div class="card">
+    <div class="card-header">📋 需求完成总结</div>
+    <div class="card-body">
+      <table>
+        <tr><td>需求名称</td><td>{storyNameCN}</td></tr>
+        <tr><td>需求号</td><td>{storyId}</td></tr>
+        <tr><td>本次总结时间</td><td>{summaryTime}</td></tr>
+        <tr><td>本次迭代说明</td><td>{iterationDescription}</td></tr>
+        <tr><td>工作模式</td><td>{workMode} / {devMode}</td></tr>
+        <tr><td>Git 分支</td><td>{storyBranch}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 迭代历史 -->
+  <!-- ⚠️ 填充时只生成 <tr> 行，不要重复生成 <table> 或 <tbody> 标签 -->
+  <div class="card">
+    <div class="card-header">📜 迭代历史</div>
+    <div class="card-body">
+      <table class="data-table">
+        <thead><tr><th>版本</th><th>时间</th><th>作者</th><th>描述</th></tr></thead>
+        <tbody>{iterationHistory}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 功能清单 -->
+  <div class="card">
+    <div class="card-header">🎯 功能清单</div>
+    <div class="card-body">
+      <ul class="feature-list">{featureList}</ul>
+    </div>
+  </div>
+
+  <!-- 技术架构 -->
+  <div class="card">
+    <div class="card-header">🏗️ 技术架构</div>
+    <div class="card-body">
+      <table>
+        <tr><td>技术栈</td><td>{techStack}</td></tr>
+        <tr><td>目录结构</td><td><code>{directoryStructure}</code></td></tr>
+        <tr><td>API 清单</td><td>{apiList}</td></tr>
+        <tr><td>数据库变更</td><td>{dbChanges}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 交付统计 -->
+  <div class="card">
+    <div class="card-header">📊 交付统计</div>
+    <div class="card-body">
+      <div class="stat-grid">{statItems}</div>
+    </div>
+  </div>
+
+  <!-- 已知限制与待完善 -->
+  <div class="card">
+    <div class="card-header">⚠️ 已知限制与待完善</div>
+    <div class="card-body">
+      {knownLimits}
+    </div>
+  </div>
+
+  <!-- 后续迭代建议（必填） -->
+  <!-- ⚠️ 此区域必须填充，不可留空。至少给出 1-3 条后续可扩展的方向建议 -->
+  <div class="card">
+    <div class="card-header">💡 后续迭代建议</div>
+    <div class="card-body">
+      {futureSuggestions}
+    </div>
+  </div>
+
+  <!-- 封板签认 -->
+  <div class="card">
+    <div class="card-header">✍️ 本次总结签认</div>
+    <div class="card-body">
+      <div class="signoff-box">
+        <p>开发者：<strong>{storyAuthor}</strong></p>
+        <p>日期：<strong>{summaryDate}</strong></p>
+        <p>状态：<strong>✅ 本次迭代功能已完成</strong></p>
+        <p class="stamp">🐴 {storyAuthor} · {summaryDate}</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="footer">── 由 🐴 泥马开发 v4.0 生成 │ {generatedTime} ──</div>
+</body>
+</html>

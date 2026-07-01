@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【研发设计】门户便签功能 — 泥马开发</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-card: #ffffff;
+  --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+  --border: #e2e8f0; --accent: #3b82f6; --accent-light: #dbeafe;
+  --success: #22c55e; --success-light: #dcfce7;
+  --warning: #f59e0b; --warning-light: #fef3c7;
+  --danger: #ef4444; --danger-light: #fee2e2;
+  --info: #06b6d4; --info-light: #cffafe;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1); --radius: 12px; --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+    --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+    --border: #334155; --accent: #60a5fa; --accent-light: #1e3a5f;
+    --success: #4ade80; --success-light: #14532d;
+    --warning: #fbbf24; --warning-light: #451a03;
+    --danger: #f87171; --danger-light: #450a0a;
+    --info: #22d3ee; --info-light: #083344;
+  }
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.header { text-align: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.header .subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.card-body { padding: 1.5rem; }
+.section { margin-bottom: 1.5rem; }
+.section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); }
+.section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent); }
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+th, td { padding: 0.625rem 0.875rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+th { background: var(--bg-secondary); font-weight: 600; }
+pre { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; }
+code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+.api-method { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem; margin-right: 0.5rem; }
+.api-get { background: var(--success-light); color: var(--success); }
+.api-post { background: var(--accent-light); color: var(--accent); }
+.api-put { background: var(--warning-light); color: var(--warning); }
+.api-delete { background: var(--danger-light); color: var(--danger); }
+.todo-check { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0; }
+.code-ref { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.8rem; }
+.footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.75rem; }
+@media print { .card { box-shadow: none; break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🐴 【研发设计】门户便签功能</h1>
+    <p class="subtitle">需求号：20260701 │ 作者：stone │ 2026-07-01 10:15</p>
+  </div>
+
+  <!-- 总体设计 -->
+  <div class="card">
+    <div class="card-header">一、总体设计</div>
+    <div class="card-body">
+      <div class="section">
+        <h3>架构变更</h3>
+        <p>在 {backend_project} 模块下新增 StickyNote 子模块，遵循 Jeecg-boot 的手动 CRUD 模式（非 continew-crud）；前端在 {frontend_project} 的 tools 目录下新增 sticky-note 模块，遵循 print-tool 的配置化注册模式。新增数据库表 sticky_note 用于持久化存储。</p>
+      </div>
+      <div class="section">
+        <h3>模块划分</h3>
+        <table>
+          <thead><tr><th>模块</th><th>改动类型</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>后端 - StickyNote CRUD</td><td>新增</td><td>Controller/Service/Mapper/Entity（Jeecg-boot 手动 CRUD 模式）</td></tr>
+            <tr><td>后端 - 数据库表</td><td>新增</td><td>sticky_note 表</td></tr>
+            <tr><td>前端 - API 封装</td><td>新增</td><td>src/api/stickyNote.ts</td></tr>
+            <tr><td>前端 - 便签组件</td><td>新增</td><td>src/tools/sticky-note/ 目录</td></tr>
+            <tr><td>前端 - 工具配置</td><td>修改</td><td>src/config/startTools.ts 新增便签项</td></tr>
+            <tr><td>前端 - 起始页分发</td><td>修改</td><td>src/views/welcome/start/index.vue 新增 case</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据库设计 -->
+  <div class="card">
+    <div class="card-header">二、数据库设计</div>
+    <div class="card-body">
+      <h3>2.1 建表 SQL</h3>
+      <pre><code>CREATE TABLE `sticky_note` (
+  `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id`     BIGINT       NOT NULL COMMENT '用户ID（Sa-Token登录用户）',
+  `content`     TEXT         NOT NULL DEFAULT '' COMMENT '便签内容',
+  `create_user` BIGINT       DEFAULT NULL COMMENT '创建人',
+  `create_time` DATETIME     DEFAULT NULL COMMENT '创建时间',
+  `update_user` BIGINT       DEFAULT NULL COMMENT '修改人',
+  `update_time` DATETIME     DEFAULT NULL COMMENT '修改时间',
+  `deleted`     BIGINT       NOT NULL DEFAULT 0 COMMENT '逻辑删除（0=否，1=是）',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='用户便签表';</code></pre>
+
+      <h3>2.2 核心表说明</h3>
+      <table>
+        <thead><tr><th>表名</th><th>业务含义</th><th>查询条件</th><th>更新字段</th></tr></thead>
+        <tbody>
+          <tr><td>sticky_note</td><td>用户便签，每条记录是一个便签</td><td>user_id = 当前用户 AND deleted = 0 ORDER BY update_time DESC</td><td>content, update_user, update_time</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 后端接口设计 -->
+  <div class="card">
+    <div class="card-header">三、后端接口设计</div>
+    <div class="card-body">
+      <p>遵循 Jeecg-boot 手动 CRUD 模式，路径前缀 <span class="code-ref">/portal/stickyNote</span>，用户身份通过 <span class="code-ref">JwtUtil.getUserNameByToken(request)</span> 获取。</p>
+
+      <h3>3.1 接口清单</h3>
+      <table>
+        <thead><tr><th>HTTP 方法</th><th>路径</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-get">GET</span></td><td>/portal/stickyNote/listing</td><td>获取当前用户便签列表（按修改时间倒序）</td></tr>
+          <tr><td><span class="api-method api-post">POST</span></td><td>/portal/stickyNote/add</td><td>创建新便签</td></tr>
+          <tr><td><span class="api-method api-put">PUT</span></td><td>/portal/stickyNote/edit</td><td>更新便签内容</td></tr>
+          <tr><td><span class="api-method api-delete">DELETE</span></td><td>/portal/stickyNote/delete?id=xxx</td><td>删除便签</td></tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 Entity 设计</h3>
+      <pre><code>@Data
+@TableName("sticky_note")
+@ApiModel(value = "用户便签对象", description = "用户个人便签")
+public class StickyNote implements Serializable {
+    @TableId(type = IdType.ASSIGN_ID)
+    private String id;
+
+    private String userId;
+    private String content;
+    private Date createTime;
+    private Date updateTime;
+}</code></pre>
+
+      <h3>3.3 Mapper 设计</h3>
+      <pre><code>@Mapper
+public interface StickyNoteMapper extends BaseMapper&lt;StickyNote&gt; {}</code></pre>
+
+      <h3>3.4 Service 层设计</h3>
+      <pre><code>public interface StickyNoteService extends IService&lt;StickyNote&gt; {
+    /** 查询当前用户便签列表（按修改时间倒序） */
+    List&lt;StickyNote&gt; listing(String userId);
+
+    /** 保存或更新便签 */
+    void saveOrUpdateNote(StickyNote note);
+}</code></pre>
+
+      <h4>ServiceImpl 核心逻辑</h4>
+      <pre><code>@Service
+public class StickyNoteServiceImpl extends ServiceImpl&lt;StickyNoteMapper, StickyNote&gt; implements StickyNoteService {
+
+    @Override
+    public List&lt;StickyNote&gt; listing(String userId) {
+        QueryWrapper&lt;StickyNote&gt; qw = new QueryWrapper&lt;&gt;();
+        qw.eq("user_id", userId);
+        qw.orderByDesc("update_time");
+        return list(qw);
+    }
+
+    @Override
+    public void saveOrUpdateNote(StickyNote note) {
+        if (note.getId() != null) {
+            note.setUpdateTime(new Date());
+            updateById(note);
+        } else {
+            note.setCreateTime(new Date());
+            note.setUpdateTime(new Date());
+            save(note);
+        }
+    }
+}</code></pre>
+
+      <h3>3.5 Controller 设计</h3>
+      <pre><code>@Api(tags = "便签管理")
+@RestController
+@RequestMapping("/portal/stickyNote")
+public class StickyNoteController {
+
+    private final StickyNoteService stickyNoteService;
+
+    public StickyNoteController(StickyNoteService stickyNoteService) {
+        this.stickyNoteService = stickyNoteService;
+    }
+
+    @GetMapping("/listing")
+    public Result&lt;?&gt; listing(HttpServletRequest request) {
+        String userId = JwtUtil.getUserNameByToken(request);
+        if (userId == null) return Result.error("未登录");
+        return Result.OK(stickyNoteService.listing(userId));
+    }
+
+    @PostMapping("/add")
+    public Result&lt;?&gt; add(HttpServletRequest request) {
+        String userId = JwtUtil.getUserNameByToken(request);
+        if (userId == null) return Result.error("未登录");
+        StickyNote note = new StickyNote();
+        note.setUserId(userId);
+        note.setContent("");
+        stickyNoteService.saveOrUpdateNote(note);
+        return Result.OK(note);
+    }
+
+    @PutMapping("/edit")
+    public Result&lt;?&gt; edit(@RequestBody StickyNote note, HttpServletRequest request) {
+        String userId = JwtUtil.getUserNameByToken(request);
+        if (userId == null) return Result.error("未登录");
+        StickyNote existing = stickyNoteService.getById(note.getId());
+        if (existing == null || !existing.getUserId().equals(userId)) {
+            return Result.error("无权操作");
+        }
+        existing.setContent(note.getContent());
+        stickyNoteService.saveOrUpdateNote(existing);
+        return Result.OK("保存成功");
+    }
+
+    @DeleteMapping("/delete")
+    public Result&lt;?&gt; delete(@RequestParam String id, HttpServletRequest request) {
+        String userId = JwtUtil.getUserNameByToken(request);
+        if (userId == null) return Result.error("未登录");
+        StickyNote existing = stickyNoteService.getById(id);
+        if (existing == null || !existing.getUserId().equals(userId)) {
+            return Result.error("无权操作");
+        }
+        stickyNoteService.removeById(id);
+        return Result.OK("删除成功");
+    }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 前端设计 -->
+  <div class="card">
+    <div class="card-header">四、前端设计</div>
+    <div class="card-body">
+      <h3>4.1 组件结构</h3>
+      <pre><code>src/tools/sticky-note/
+├── index.ts                        # 导出入口
+├── StickyNoteDialog.vue            # 主弹窗（使用 ToolDialogShell）
+├── components/
+│   └── StickyNoteCard.vue          # 单条便签卡片
+├── composables/
+│   └── useStickyNote.ts            # CRUD 逻辑 + 实时保存
+├── types.ts                        # 类型定义
+└── constants.ts                    # 常量定义</code></pre>
+
+      <h3>4.2 类型定义</h3>
+      <pre><code>// types.ts
+export interface StickyNoteItem {
+  id: string;
+  content: string;
+  createTime?: string;
+  updateTime?: string;
+}
+
+export interface StickyNoteFormData {
+  id?: string;
+  content: string;
+}</code></pre>
+
+      <h3>4.3 API 封装</h3>
+      <pre><code>// src/api/stickyNote.ts
+import { http } from "@/utils/http";
+import type { HttpResult } from "@/utils/http/types.d";
+import type { StickyNoteItem } from "@/tools/sticky-note/types";
+
+/** 获取当前用户便签列表 */
+export const getStickyNoteList = () => {
+  return http.get&lt;HttpResult&gt;("/portal/stickyNote/listing", {
+    showLoading: false,
+    silent: true
+  });
+};
+
+/** 创建便签 */
+export const createStickyNote = () => {
+  return http.post&lt;HttpResult&gt;("/portal/stickyNote/add", {}, { showLoading: false });
+};
+
+/** 更新便签 */
+export const updateStickyNote = (data: StickyNoteItem) => {
+  return http.put&lt;HttpResult&gt;("/portal/stickyNote/edit", data, { showLoading: false });
+};
+
+/** 删除便签 */
+export const deleteStickyNote = (id: string) => {
+  return http.del&lt;HttpResult&gt;("/portal/stickyNote/delete", {
+    params: { id },
+    showLoading: false
+  });
+};</code></pre>
+
+      <h3>4.4 实时保存 Composable</h3>
+      <pre><code>// composables/useStickyNote.ts
+import { ref, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import type { StickyNoteItem } from "../types";
+import { getStickyNoteList, createStickyNote, updateStickyNote, deleteStickyNote } from "@/api/stickyNote";
+
+export function useStickyNote() {
+  const notes = ref&lt;StickyNoteItem[]&gt;([]);
+  const loading = ref(false);
+
+  // 防抖定时器映射：noteId -> timer
+  const saveTimers = new Map&lt;string, ReturnType&lt;typeof setTimeout&gt;&gt;();
+
+  /** 加载便签列表 */
+  const loadNotes = async () => {
+    loading.value = true;
+    try {
+      const res = await getStickyNoteList();
+      if (res.success) {
+        notes.value = (res.result?.records || res.result || []) as StickyNoteItem[];
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /** 创建便签 */
+  const addNote = async () => {
+    const res = await createStickyNote({ content: "" });
+    if (res.success) {
+      await loadNotes();
+    }
+  };
+
+  /** 实时保存（防抖500ms） */
+  const saveNote = (note: StickyNoteItem) => {
+    const timer = saveTimers.get(note.id);
+    if (timer) clearTimeout(timer);
+    saveTimers.set(note.id, setTimeout(async () => {
+      await updateStickyNote({ id: note.id, content: note.content });
+      saveTimers.delete(note.id);
+    }, 500));
+  };
+
+  /** 失焦保存（立即执行，取消防抖） */
+  const flushSave = async (note: StickyNoteItem) => {
+    const timer = saveTimers.get(note.id);
+    if (timer) {
+      clearTimeout(timer);
+      saveTimers.delete(note.id);
+    }
+    await updateStickyNote({ id: note.id, content: note.content });
+  };
+
+  /** 删除便签 */
+  const removeNote = async (id: string) => {
+    await ElMessageBox.confirm("确定删除这条便签吗？", "删除确认", {
+      type: "warning"
+    });
+    await deleteStickyNote(id);
+    notes.value = notes.value.filter(n => n.id !== id);
+    ElMessage.success("已删除");
+  };
+
+  onMounted(loadNotes);
+
+  return { notes, loading, addNote, saveNote, flushSave, removeNote };
+}</code></pre>
+
+      <h3>4.5 工具配置注册</h3>
+      <pre><code>// src/config/startTools.ts 新增
+{
+  id: "__tool_sticky_note__",
+  label: "便签",
+  value: "sticky-note",
+  description: "快速创建和管理个人便签",
+  iconName: "📝"
+}</code></pre>
+
+      <h3>4.6 起始页分发</h3>
+      <pre><code>// src/views/welcome/start/index.vue
+import { StickyNoteDialog } from "@/tools/sticky-note";
+
+// handleAppClick 新增 case:
+case "sticky-note":
+  showStickyNote.value = true;
+  break;
+
+// template 新增:
+&lt;StickyNoteDialog v-model:visible="showStickyNote" /&gt;</code></pre>
+    </div>
+  </div>
+
+  <!-- 角色互搏结论 -->
+  <div class="card">
+    <div class="card-header">五、角色互搏结论</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>确认点</th><th>决策</th></tr></thead>
+        <tbody>
+          <tr><td>内容类型</td><td>纯文本（TEXT + textarea）</td></tr>
+          <tr><td>用户隔离</td><td>Sa-Token StpUtil.getLoginIdAsLong() 自动注入</td></tr>
+          <tr><td>保存策略</td><td>防抖 500ms + 失焦双触发</td></tr>
+          <tr><td>删除策略</td><td>逻辑删除（deleted 字段）</td></tr>
+          <tr><td>列表排序</td><td>update_time 倒序（最近修改在前）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TODO 清单 -->
+  <div class="card">
+    <div class="card-header">六、TODO 清单</div>
+    <div class="card-body">
+      <div class="todo-check">☐ 创建数据库表 sticky_note（执行建表 SQL）</div>
+      <div class="todo-check">☐ 后端({backend_project})：StickyNote 实体类</div>
+      <div class="todo-check">☐ 后端({backend_project})：StickyNoteMapper 接口</div>
+      <div class="todo-check">☐ 后端({backend_project})：StickyNoteService 接口 + Impl 实现</div>
+      <div class="todo-check">☐ 后端({backend_project})：StickyNoteController 手动 CRUD</div>
+      <div class="todo-check">☐ 前端：src/api/stickyNote.ts API 封装（路径 /portal/stickyNote/*）</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/types.ts 类型定义</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/constants.ts 常量</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/composables/useStickyNote.ts</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/components/StickyNoteCard.vue</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/StickyNoteDialog.vue</div>
+      <div class="todo-check">☐ 前端：src/tools/sticky-note/index.ts 导出</div>
+      <div class="todo-check">☐ 前端：src/config/startTools.ts 新增便签配置</div>
+      <div class="todo-check">☐ 前端：src/views/welcome/start/index.vue 新增分发逻辑</div>
+      <div class="todo-check">☐ 验证：mvn compile 后端编译通过</div>
+      <div class="todo-check">☐ 验证：pnpm dev 前端运行正常</div>
+    </div>
+  </div>
+
+</div>
+<div class="footer">── 由 🐴 泥马开发 v4.0 生成 │ 2026-07-01 10:15 ──</div>
+</body>
+</html>

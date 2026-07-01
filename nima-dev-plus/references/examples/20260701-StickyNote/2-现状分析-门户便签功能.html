@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【现状分析】门户便签功能 — 泥马开发</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-card: #ffffff;
+  --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+  --border: #e2e8f0; --accent: #3b82f6; --accent-light: #dbeafe;
+  --success: #22c55e; --success-light: #dcfce7;
+  --warning: #f59e0b; --warning-light: #fef3c7;
+  --danger: #ef4444; --danger-light: #fee2e2;
+  --info: #06b6d4; --info-light: #cffafe;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1); --radius: 12px; --radius-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+    --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+    --border: #334155; --accent: #60a5fa; --accent-light: #1e3a5f;
+    --success: #4ade80; --success-light: #14532d;
+    --warning: #fbbf24; --warning-light: #451a03;
+    --danger: #f87171; --danger-light: #450a0a;
+    --info: #22d3ee; --info-light: #083344;
+  }
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.header { text-align: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.header .subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.card-body { padding: 1.5rem; }
+.section { margin-bottom: 1.5rem; }
+.section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); }
+.section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent); }
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+th, td { padding: 0.625rem 0.875rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+th { background: var(--bg-secondary); font-weight: 600; }
+pre { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; }
+code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+.code-ref { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.8rem; }
+.flow-step { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; flex-wrap: wrap; }
+.flow-arrow { color: var(--text-muted); }
+.risk-high { background: var(--danger-light); border-left: 3px solid var(--danger); padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.risk-medium { background: var(--warning-light); border-left: 3px solid var(--warning); padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.risk-low { background: var(--info-light); border-left: 3px solid var(--info); padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.75rem; }
+@media print { .card { box-shadow: none; break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🐴 【现状分析】门户便签功能</h1>
+    <p class="subtitle">需求号：20260701 │ 作者：stone │ 2026-07-01 10:10</p>
+  </div>
+
+  <!-- 一、项目环境总览 -->
+  <div class="card">
+    <div class="card-header">一、项目环境总览</div>
+    <div class="card-body">
+      <table>
+        <tr><td>JDK 版本</td><td>17</td></tr>
+        <tr><td>Spring Boot 版本</td><td>ContiNew Starter 2.14.0</td></tr>
+        <tr><td>ORM 框架</td><td>MyBatis-Plus</td></tr>
+        <tr><td>业务基础框架</td><td>ContiNew Starter (continew-crud)</td></tr>
+        <tr><td>CRUD 基类</td><td>BaseController / BaseService / BaseServiceImpl</td></tr>
+        <tr><td>前端框架</td><td>Vue 3.5 + Vite 6 + TypeScript + Element Plus + Tailwind CSS 4 + Pinia</td></tr>
+        <tr><td>数据库</td><td>MySQL</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 二、业务流程现状 -->
+  <div class="card">
+    <div class="card-header">二、业务流程现状</div>
+    <div class="card-body">
+      <h3>2.1 现有打印工具流程（参照基准）</h3>
+      <div class="section">
+        <div class="flow-step"><span class="code-ref">startTools.ts</span> <span class="flow-arrow">→</span> 配置 COMMON_TOOLS_APPS 数组</div>
+        <div class="flow-step"><span class="code-ref">index.vue</span> <span class="flow-arrow">→</span> 读取配置转为 toolsAppList，传入 AppGrid</div>
+        <div class="flow-step"><span class="code-ref">AppGrid.vue</span> <span class="flow-arrow">→</span> 渲染"常用工具"分组卡片</div>
+        <div class="flow-step"><span class="code-ref">index.vue handleAppClick()</span> <span class="flow-arrow">→</span> 判断 type==="tool"，按 value 分发</div>
+        <div class="flow-step"><span class="code-ref">switch(app.value)</span> <span class="flow-arrow">→</span> case "print" → showPrintTool = true</div>
+        <div class="flow-step"><span class="code-ref">PrintToolDialog.vue</span> <span class="flow-arrow">→</span> 弹窗展示，纯前端实现</div>
+      </div>
+
+      <h3>2.2 后端 busi 模块 CRUD 模式（参照基准）</h3>
+      <div class="section">
+        <div class="flow-step"><span class="code-ref">SsoClientController</span> <span class="flow-arrow">→</span> @CrudRequestMapping 注解自动生成 CRUD 接口</div>
+        <div class="flow-step"><span class="code-ref">SsoClientService</span> <span class="flow-arrow">→</span> extends BaseService（项目基类）</div>
+        <div class="flow-step"><span class="code-ref">SsoClientServiceImpl</span> <span class="flow-arrow">→</span> extends BaseServiceImpl，可覆写 beforeCreate/afterCreate 等钩子</div>
+        <div class="flow-step"><span class="code-ref">SsoClientMapper</span> <span class="flow-arrow">→</span> extends BaseMapper&lt;DO&gt;，@Mapper 注解</div>
+        <div class="flow-step"><span class="code-ref">SsoClientDO</span> <span class="flow-arrow">→</span> extends BaseDO（含 createUser/createTime/updateUser/updateTime/deleted）</div>
+        <div class="flow-step"><span class="code-ref">SsoClientReq</span> <span class="flow-arrow">→</span> implements Serializable，@Schema 注解，JSR-303 校验</div>
+        <div class="flow-step"><span class="code-ref">SsoClientResp</span> <span class="flow-arrow">→</span> extends BaseResp，@Schema 注解</div>
+      </div>
+
+      <h3>2.3 前端 API 调用模式</h3>
+      <div class="section">
+        <div class="flow-step"><span class="code-ref">src/api/startPage.ts</span> <span class="flow-arrow">→</span> 使用 http.get/post/put/del 封装</div>
+        <div class="flow-step"><span class="code-ref">http 工具</span> <span class="flow-arrow">→</span> src/utils/http/index.ts，Axios 封装，自动注入 X-Access-Token</div>
+        <div class="flow-step"><span class="code-ref">代理路径</span> <span class="flow-arrow">→</span> /ms-boot → http://127.0.0.1:8080</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 三、涉及数据库表 -->
+  <div class="card">
+    <div class="card-header">三、涉及数据库表</div>
+    <div class="card-body">
+      <h3>3.1 新增表：sticky_note</h3>
+      <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th><th>约束</th></tr></thead>
+        <tbody>
+          <tr><td>id</td><td>BIGINT</td><td>主键 ID</td><td>PK，自增</td></tr>
+          <tr><td>user_id</td><td>BIGINT</td><td>用户 ID（Sa-Token 登录用户 ID）</td><td>NOT NULL，索引</td></tr>
+          <tr><td>content</td><td>TEXT</td><td>便签内容</td><td>NOT NULL，默认 ''</td></tr>
+          <tr><td>create_user</td><td>BIGINT</td><td>创建人</td><td>自动填充（FieldFill.INSERT）</td></tr>
+          <tr><td>create_time</td><td>DATETIME</td><td>创建时间</td><td>自动填充</td></tr>
+          <tr><td>update_user</td><td>BIGINT</td><td>修改人</td><td>自动填充（FieldFill.UPDATE）</td></tr>
+          <tr><td>update_time</td><td>DATETIME</td><td>修改时间</td><td>自动填充</td></tr>
+          <tr><td>deleted</td><td>BIGINT</td><td>逻辑删除（0=否，1=是）</td><td>NOT NULL，默认 0</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-secondary);">设计说明：继承 BaseDO 基类字段，user_id 用于数据隔离（只查询当前用户便签），content 使用 TEXT 类型支持较长文本。</p>
+    </div>
+  </div>
+
+  <!-- 四、关键代码路径 -->
+  <div class="card">
+    <div class="card-header">四、关键代码路径</div>
+    <div class="card-body">
+      <div class="section">
+        <h3>前端 — 需修改/新建</h3>
+        <table>
+          <thead><tr><th>文件</th><th>操作</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>src/config/startTools.ts</td><td>修改</td><td>新增便签工具配置项</td></tr>
+            <tr><td>src/views/welcome/start/index.vue</td><td>修改</td><td>handleAppClick 新增 case "sticky-note"，引入 StickyNoteDialog 组件</td></tr>
+            <tr><td>src/tools/sticky-note/index.ts</td><td>新建</td><td>导出 StickyNoteDialog 组件</td></tr>
+            <tr><td>src/tools/sticky-note/StickyNoteDialog.vue</td><td>新建</td><td>便签管理主弹窗</td></tr>
+            <tr><td>src/tools/sticky-note/components/StickyNoteCard.vue</td><td>新建</td><td>单条便签卡片（编辑/删除）</td></tr>
+            <tr><td>src/tools/sticky-note/composables/useStickyNote.ts</td><td>新建</td><td>便签 CRUD 逻辑 + 实时保存</td></tr>
+            <tr><td>src/tools/sticky-note/types.ts</td><td>新建</td><td>类型定义</td></tr>
+            <tr><td>src/tools/sticky-note/constants.ts</td><td>新建</td><td>常量定义</td></tr>
+            <tr><td>src/api/stickyNote.ts</td><td>新建</td><td>后端 API 封装</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <h3>后端 — 需新建</h3>
+        <table>
+          <thead><tr><th>文件</th><th>包路径</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>StickyNoteController.java</td><td>busi.controller</td><td>CRUD 接口，@CrudRequestMapping</td></tr>
+            <tr><td>StickyNoteService.java</td><td>busi.service</td><td>业务接口</td></tr>
+            <tr><td>StickyNoteServiceImpl.java</td><td>busi.service.impl</td><td>业务实现，继承 BaseServiceImpl</td></tr>
+            <tr><td>StickyNoteMapper.java</td><td>busi.mapper</td><td>数据访问层</td></tr>
+            <tr><td>StickyNoteDO.java</td><td>busi.model.entity</td><td>实体类，继承 BaseDO</td></tr>
+            <tr><td>StickyNoteQuery.java</td><td>busi.model.query</td><td>查询条件</td></tr>
+            <tr><td>StickyNoteReq.java</td><td>busi.model.req</td><td>创建/修改请求参数</td></tr>
+            <tr><td>StickyNoteResp.java</td><td>busi.model.resp</td><td>响应 DTO</td></tr>
+            <tr><td>StickyNoteDetailResp.java</td><td>busi.model.resp</td><td>详情响应 DTO</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <h3>数据库</h3>
+        <table>
+          <thead><tr><th>操作</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>CREATE TABLE sticky_note</td><td>新建便签表</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五、风险点 -->
+  <div class="card">
+    <div class="card-header">五、风险点</div>
+    <div class="card-body">
+      <div class="risk-low">
+        <strong>低风险 — 实时保存防抖</strong><br>
+        触发条件：用户快速连续输入。影响：可能产生较多请求。<br>
+        建议：前端防抖 500ms，后端接口幂等（update 按 id 更新）。
+      </div>
+      <div class="risk-low">
+        <strong>低风险 — 用户数据隔离</strong><br>
+        触发条件：后端查询未正确过滤 user_id。影响：可能看到其他用户便签。<br>
+        建议：Service 层 list 方法自动注入当前用户 ID 作为查询条件（参考 SsoClientService.listPortalApps 的模式）。
+      </div>
+      <div class="risk-low">
+        <strong>低风险 — 内容长度</strong><br>
+        触发条件：用户输入超长文本。影响：数据库存储压力。<br>
+        建议：前端 textarea 限制最大长度（如 5000 字符），后端 content 字段使用 TEXT 类型（最大 65535 字节）。
+      </div>
+      <div class="risk-medium">
+        <strong>中风险 — 并发编辑</strong><br>
+        触发条件：同一用户在两个设备上同时编辑同一条便签。影响：后覆盖前。<br>
+        建议：本期不做乐观锁，接受"最后写入胜出"策略（便签是个人工具，并发概率极低）。
+      </div>
+    </div>
+  </div>
+
+  <!-- 六、数据流 -->
+  <div class="card">
+    <div class="card-header">六、数据流</div>
+    <div class="card-body">
+      <h3>6.1 创建便签</h3>
+      <div class="flow-step">前端点击"新建" <span class="flow-arrow">→</span> POST /busi/stickyNote <span class="flow-arrow">→</span> Controller <span class="flow-arrow">→</span> Service.beforeCreate <span class="flow-arrow">→</span> Mapper.insert <span class="flow-arrow">→</span> DB</div>
+
+      <h3>6.2 编辑便签（实时保存）</h3>
+      <div class="flow-step">前端编辑内容 <span class="flow-arrow">→</span> 防抖 500ms <span class="flow-arrow">→</span> PUT /busi/stickyNote <span class="flow-arrow">→</span> Controller <span class="flow-arrow">→</span> Service.afterUpdate <span class="flow-arrow">→</span> Mapper.updateById <span class="flow-arrow">→</span> DB</div>
+
+      <h3>6.3 查询便签列表</h3>
+      <div class="flow-step">弹窗打开 <span class="flow-arrow">→</span> GET /busi/stickyNote/page <span class="flow-arrow">→</span> Controller <span class="flow-arrow">→</span> Service.list（自动注入 user_id 条件）<span class="flow-arrow">→</span> DB</div>
+
+      <h3>6.4 删除便签</h3>
+      <div class="flow-step">前端点击删除 <span class="flow-arrow">→</span> ElMessageBox 确认 <span class="flow-arrow">→</span> DELETE /busi/stickyNote/batchDelete <span class="flow-arrow">→</span> Controller <span class="flow-arrow">→</span> Service.delete（逻辑删除）<span class="flow-arrow">→</span> DB</div>
+    </div>
+  </div>
+
+  <!-- 七、兼容性分析 -->
+  <div class="card">
+    <div class="card-header">七、兼容性分析</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>维度</th><th>结论</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>历史数据兼容</td><td>✅ 无影响</td><td>新增表，不涉及历史数据迁移</td></tr>
+          <tr><td>接口向前兼容</td><td>✅ 无影响</td><td>新增接口，不影响现有功能</td></tr>
+          <tr><td>权限/角色影响</td><td>⚠ 需注意</td><td>便签接口需登录态，使用 Sa-Token 获取用户 ID 自动隔离</td></tr>
+          <tr><td>前端构建兼容</td><td>✅ 无影响</td><td>新增组件/路由模块，不修改现有核心逻辑</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 八、项目特性记忆 -->
+  <div class="card">
+    <div class="card-header">八、项目特性记忆</div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>维度</th><th>记忆内容</th></tr></thead>
+        <tbody>
+          <tr><td>后端 Controller 模式</td><td>@CrudRequestMapping 注解 + extends BaseController，自动生成 CRUD 端点</td></tr>
+          <tr><td>后端 Service 模式</td><td>interface extends BaseService + Impl extends BaseServiceImpl，可覆写 before/after 钩子</td></tr>
+          <tr><td>后端 Entity 模式</td><td>extends BaseDO，包含通用字段（createUser/createTime/updateUser/updateTime/deleted）</td></tr>
+          <tr><td>后端 Mapper 模式</td><td>extends BaseMapper&lt;DO&gt;，@Mapper 注解，无自定义 SQL 时可空实现</td></tr>
+          <tr><td>前端工具注册</td><td>config/startTools.ts 配置 → index.vue handleAppClick 按 value 分发</td></tr>
+          <tr><td>前端 API 调用</td><td>http.get/post/put/del + { showLoading, silent } 选项</td></tr>
+          <tr><td>前端弹窗模式</td><td>Teleport to body + Transition 动画 + ESC 关闭 + 遮罩关闭</td></tr>
+          <tr><td>前端共享壳</td><td>ToolDialogShell 提供统一弹窗外观（标题栏+关闭按钮+底部 slot）</td></tr>
+          <tr><td>用户上下文</td><td>Sa-Token StpUtil.getLoginIdAsLong() 获取当前用户 ID</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<div class="footer">── 由 🐴 泥马开发 v4.0 生成 │ 2026-07-01 10:10 ──</div>
+</body>
+</html>
