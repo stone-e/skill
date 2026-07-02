@@ -28,7 +28,7 @@
   "business": ["门户", "JWT认证"],
   "feature": ["防抖", "用户隔离"],
   "tech": ["Vue3", "Jeecg-boot"],
-  "module": ["ms-portal-web", "tools"]
+  "module": ["{项目技术名}", "{模块名}"]
 }
 ```
 
